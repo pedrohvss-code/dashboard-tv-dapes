@@ -67,8 +67,8 @@ Start-Process $navegador -ArgumentList @(
   "--user-data-dir=`"$perfil`"",
   "--window-position=$($b.X),$($b.Y)",
   "--window-size=$($b.Width),$($b.Height)",
-  "--kiosk", "--edge-kiosk-type=fullscreen",
+  "--start-fullscreen",
   "--no-first-run", "--noerrdialogs", "--disable-session-crashed-bubble",
   "--disable-features=Translate",
-  $url
+  "--app=$url"
 )
