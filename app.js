@@ -85,14 +85,11 @@
     tela.style.gridTemplateRows = `repeat(${linhas}, minmax(0, 1fr))`;
 
     main.insertBefore(tela, nomeTela);
-    telas.push({ el: tela, titulo: def.titulo, def: def, montada: false });
+    telas.push({ el: tela, titulo: def.titulo, def: def });
   });
 
-  // Os widgets de cada tela só são criados quando necessário: navegadores de TV
-  // são lentos e carregar tudo de uma vez trava a primeira tela.
+  // Todas as telas são montadas logo no início: ao entrar na rotação já estão prontas
   function montarTela(t) {
-    if (t.montada) return;
-    t.montada = true;
     t.def.widgets.forEach((w) => {
       const bloco = document.createElement("div");
       bloco.className = "bloco";
@@ -109,7 +106,6 @@
   function mostrar(i) {
     if (atual >= 0) telas[atual].el.classList.remove("ativa");
     atual = (i + telas.length) % telas.length;
-    montarTela(telas[atual]);
     telas[atual].el.classList.add("ativa");
     nomeTela.textContent = `${telas[atual].titulo} · ${atual + 1}/${telas.length}${pausado ? " · pausado" : ""}`;
     reiniciarTimer();
@@ -147,12 +143,8 @@
     }
   });
 
+  telas.forEach(montarTela);
   mostrar(0);
-
-  // Pré-carrega as demais telas, uma por vez, antes de chegar a vez delas
-  telas.forEach((t, i) => {
-    if (i > 0) setTimeout(() => montarTela(t), i * CFG.intervaloCarga * 1000);
-  });
 
   // ===================================================================
   //  Faixa de cotações e título
@@ -213,8 +205,6 @@
   function atualizarRelogio() {
     const t = agoraSP();
     elHora.textContent = t.hms;
-    // Recarga diária da página (evita travamentos em uso contínuo)
-    if (CFG.recarregarAs && t.hms === CFG.recarregarAs + ":00") location.reload();
     const data = fmtData.format(new Date());
     elData.textContent = data.charAt(0).toUpperCase() + data.slice(1);
 

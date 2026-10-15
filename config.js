@@ -12,11 +12,6 @@ window.DASH_CONFIG = {
   // Tempo de cada tela, em segundos
   tempoPorTela: 45,
 
-  // Segundos entre o carregamento de uma tela e a próxima (TV lenta: aumente)
-  intervaloCarga: 15,
-
-  // Horário diário (Brasília) em que a página se recarrega sozinha. "" desativa.
-  recarregarAs: "07:30",
 
   // ---------------------------------------------------------------
   // Pregão B3 (horário de Brasília). A B3 muda o horário conforme o
