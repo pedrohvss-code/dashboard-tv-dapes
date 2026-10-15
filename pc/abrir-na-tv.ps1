@@ -40,11 +40,17 @@ if ($Listar) { exit }
 if ($Monitor -gt 0) {
   $alvo = $telas | Where-Object { (& $numero $_) -eq $Monitor }
 } else {
-  $alvo = $telas | Where-Object { -not $_.Primary } | Sort-Object { & $numero $_ } | Select-Object -Last 1
+  # Só abre se houver uma tela sem fio (Screen Share): mais telas do que monitores
+  # com cabo. Assim o dashboard nunca toma um monitor normal da mesa.
+  $comCabo = @(Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ErrorAction SilentlyContinue |
+    Where-Object { $_.Active -and $_.VideoOutputTechnology -ne 15 }).Count
+  if ($telas.Count -gt $comCabo) {
+    $alvo = $telas | Where-Object { -not $_.Primary } | Sort-Object { & $numero $_ } | Select-Object -Last 1
+  }
 }
 
 if (-not $alvo) {
-  Write-Warning "Nenhuma tela extra encontrada. Conecte a TV com Win+K e escolha 'Estender' em Win+P."
+  Write-Warning "TV não encontrada. Conecte a TV com Win+K e escolha 'Estender' em Win+P."
   Read-Host "Enter para sair"
   exit 1
 }
