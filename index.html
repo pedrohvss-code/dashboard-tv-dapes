@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard TV</title>
-  <link rel="stylesheet" href="style.css">
+  <script>
+    // Sufixo único a cada carga: impede que a TV/navegador use CSS/JS antigos do cache
+    window.V = Date.now();
+    document.write('<link rel="stylesheet" href="style.css?v=' + V + '">');
+  </script>
 </head>
 <body>
   <header>
@@ -29,7 +33,9 @@
 
   <footer id="rodape"></footer>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script>
+    document.write('<script src="config.js?v=' + V + '"><\/script>');
+    document.write('<script src="app.js?v=' + V + '"><\/script>');
+  </script>
 </body>
 </html>
