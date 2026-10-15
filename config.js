@@ -7,7 +7,7 @@
 // =====================================================================
 
 window.DASH_CONFIG = {
-  titulo: "Mesa · Mercado",
+  titulo: "Mesa RV",
 
   // Tempo de cada tela, em segundos
   tempoPorTela: 45,

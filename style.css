@@ -8,6 +8,7 @@
   --amarelo: #eab308;
   --vermelho: #ef4444;
   --azul: #3b82f6;
+  --dourado: #bb8333;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,8 +37,12 @@ header {
   border-bottom: 1px solid var(--borda);
 }
 
-.titulo { font-size: 2.2vh; color: var(--suave); letter-spacing: .08em; text-transform: uppercase; }
-.titulo strong { display: block; font-size: 3.4vh; color: var(--texto); letter-spacing: 0; text-transform: none; }
+.marca { display: flex; align-items: center; gap: 1.6vh; height: 100%; }
+.marca img { height: 7.4vh; width: auto; }
+.titulo {
+  font-size: 3.2vh; font-weight: 600; letter-spacing: .04em;
+  padding-left: 1.6vh; border-left: 2px solid var(--dourado);
+}
 
 .relogio { text-align: center; }
 .relogio .hora { font-size: 5.2vh; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
