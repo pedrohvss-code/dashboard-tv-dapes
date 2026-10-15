@@ -119,11 +119,25 @@
     timer = setTimeout(() => mostrar(atual + 1), CFG.tempoPorTela * 1000);
   }
 
-  // Setas do teclado / controle remoto: navegar. OK/Espaço: pausar.
+  // Tela cheia: navegadores só permitem após uma ação do usuário (tecla/clique)
+  function telaCheia() {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) return false;
+    const pedir = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (pedir) { try { pedir.call(el); } catch (err) { /* sem suporte */ } }
+    return true;
+  }
+  document.addEventListener("click", telaCheia);
+
+  // Controle remoto / teclado: setas navegam; OK/Espaço entra em tela cheia e depois pausa.
+  // keyCode cobre navegadores de TV antigos que não preenchem e.key.
   document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") mostrar(atual + 1);
-    else if (e.key === "ArrowLeft") mostrar(atual - 1);
-    else if (e.key === " " || e.key === "Enter") { pausado = !pausado; mostrar(atual); }
+    const k = e.key || "", c = e.keyCode;
+    if (k === "ArrowRight" || c === 39) mostrar(atual + 1);
+    else if (k === "ArrowLeft" || c === 37) mostrar(atual - 1);
+    else if (k === " " || k === "Enter" || c === 13 || c === 32) {
+      if (!telaCheia()) { pausado = !pausado; mostrar(atual); }
+    }
   });
 
   mostrar(0);
@@ -139,7 +153,7 @@
   // ===================================================================
   const fmtPartes = new Intl.DateTimeFormat("en-CA", {
     timeZone: FUSO, year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
   });
   const fmtData = new Intl.DateTimeFormat("pt-BR", { timeZone: FUSO, weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const fmtFusoNY = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", timeZoneName: "short" });
@@ -148,6 +162,7 @@
   function agoraSP() {
     const p = {};
     fmtPartes.formatToParts(new Date()).forEach(({ type, value }) => (p[type] = value));
+    if (p.hour === "24") p.hour = "00"; // alguns navegadores antigos mostram meia-noite como 24
     return {
       iso: `${p.year}-${p.month}-${p.day}`,
       seg: (+p.hour) * 3600 + (+p.minute) * 60 + (+p.second),
@@ -248,7 +263,7 @@
 
   function aplicarNoticias(itens) {
     trilho.classList.remove("correndo");
-    trilho.replaceChildren();
+    trilho.innerHTML = "";
     // Conteúdo duplicado: a animação anda 50% e recomeça sem emenda visível
     for (let copia = 0; copia < 2; copia++) itens.forEach((n) => trilho.appendChild(criarNoticia(n)));
     trilho.style.animationDuration = `${trilho.scrollWidth / 2 / NC.velocidade}s`;
@@ -261,13 +276,13 @@
   });
 
   async function atualizarNoticias() {
-    const resultados = await Promise.allSettled(NC.fontes.map(buscarFonte));
-    resultados.filter((r) => r.status === "rejected").forEach((r) => console.warn("Notícias:", r.reason));
+    // Uma fonte com erro não derruba as outras
+    const listas = await Promise.all(NC.fontes.map((f) =>
+      buscarFonte(f).catch((err) => { console.warn("Notícias:", err); return []; })));
 
     const limite = Date.now() - NC.maxHorasAtras * 3600 * 1000;
     const vistos = new Set();
-    const itens = resultados
-      .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
+    const itens = [].concat(...listas)
       .filter((n) => n.titulo && !(n.data < limite) && !vistos.has(n.titulo) && vistos.add(n.titulo))
       .sort((a, b) => b.data - a.data);
 

@@ -37,8 +37,8 @@ header {
   border-bottom: 1px solid var(--borda);
 }
 
-.marca { display: flex; align-items: center; gap: 1.6vh; height: 100%; }
-.marca img { height: 7.4vh; width: auto; }
+.marca { display: flex; align-items: center; height: 100%; }
+.marca img { height: 7.4vh; width: auto; margin-right: 1.6vh; }
 .titulo {
   font-size: 3.2vh; font-weight: 600; letter-spacing: .04em;
   padding-left: 1.6vh; border-left: 2px solid var(--dourado);
@@ -50,12 +50,12 @@ header {
 
 .pregao { justify-self: end; text-align: right; }
 .status {
-  display: inline-flex; align-items: center; gap: .8vh;
+  display: inline-flex; align-items: center;
   font-size: 2.6vh; font-weight: 600;
   padding: .6vh 1.6vh; border-radius: 999px;
   background: var(--painel); border: 1px solid var(--borda);
 }
-.status::before { content: ""; width: 1.4vh; height: 1.4vh; border-radius: 50%; background: currentColor; }
+.status::before { content: ""; margin-right: .8vh; width: 1.4vh; height: 1.4vh; border-radius: 50%; background: currentColor; }
 .status.aberto     { color: var(--verde); }
 .status.leilao     { color: var(--amarelo); }
 .status.fechado    { color: var(--vermelho); }
@@ -65,8 +65,8 @@ header {
 main { position: relative; overflow: hidden; }
 
 .tela {
-  position: absolute; inset: 0;
-  display: grid; gap: 1.2vh;
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  display: grid; grid-gap: 1.2vh; gap: 1.2vh;
   padding: 1.2vh 1.2vw;
   grid-template-rows: auto;
   opacity: 0; visibility: hidden;
