@@ -10,6 +10,8 @@
 # =====================================================================
 param(
   [int]$Monitor = 0,
+  # Quantos monitores ficam ligados no PC sem a TV
+  [int]$MonitoresDaMesa = 2,
   [switch]$Listar,
   [switch]$Fechar
 )
@@ -40,11 +42,9 @@ if ($Listar) { exit }
 if ($Monitor -gt 0) {
   $alvo = $telas | Where-Object { (& $numero $_) -eq $Monitor }
 } else {
-  # Só abre se houver uma tela sem fio (Screen Share): mais telas do que monitores
-  # com cabo. Assim o dashboard nunca toma um monitor normal da mesa.
-  $comCabo = @(Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ErrorAction SilentlyContinue |
-    Where-Object { $_.Active -and $_.VideoOutputTechnology -ne 15 }).Count
-  if ($telas.Count -gt $comCabo) {
+  # Só abre se houver mais telas do que os monitores da mesa (= TV conectada).
+  # Assim o dashboard nunca toma um monitor normal da mesa.
+  if ($telas.Count -gt $MonitoresDaMesa) {
     $alvo = $telas | Where-Object { -not $_.Primary } | Sort-Object { & $numero $_ } | Select-Object -Last 1
   }
 }
