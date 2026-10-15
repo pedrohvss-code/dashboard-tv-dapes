@@ -8,6 +8,26 @@
     // Sufixo único a cada carga: impede que a TV/navegador use CSS/JS antigos do cache
     window.V = Date.now();
     document.write('<link rel="stylesheet" href="style.css?v=' + V + '">');
+
+    // Modo diagnóstico: abrir a URL com ?debug=1 mostra dados do navegador e erros na tela
+    if (/[?&]debug=1/.test(location.search)) {
+      var erros = [];
+      window.onerror = function (msg, src, linha) { erros.push(msg + " (" + (src || "").split("/").pop() + ":" + linha + ")"); };
+      window.addEventListener("unhandledrejection", function (e) { erros.push("Promise: " + e.reason); });
+      setInterval(function () {
+        var p = document.getElementById("debug");
+        if (!p) {
+          p = document.createElement("pre"); p.id = "debug";
+          p.style.cssText = "position:fixed;left:0;top:0;z-index:99;max-width:60vw;margin:0;padding:12px;" +
+            "background:rgba(0,0,0,.88);color:#0f0;font:16px/1.4 monospace;white-space:pre-wrap";
+          document.body.appendChild(p);
+        }
+        p.textContent = "Janela: " + innerWidth + "x" + innerHeight + "  DPR: " + devicePixelRatio +
+          "\nTela: " + screen.width + "x" + screen.height +
+          "\nNavegador: " + navigator.userAgent +
+          "\nErros (" + erros.length + "):\n" + (erros.slice(-8).join("\n") || "nenhum");
+      }, 1000);
+    }
   </script>
 </head>
 <body>
