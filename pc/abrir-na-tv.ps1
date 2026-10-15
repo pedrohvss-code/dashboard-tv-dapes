@@ -70,5 +70,8 @@ Start-Process $navegador -ArgumentList @(
   "--start-fullscreen",
   "--no-first-run", "--noerrdialogs", "--disable-session-crashed-bubble",
   "--disable-features=Translate",
+  # Impede o navegador de desacelerar a página (relógio e cotações atrasando)
+  "--disable-background-timer-throttling", "--disable-renderer-backgrounding",
+  "--disable-backgrounding-occluded-windows",
   "--app=$url"
 )

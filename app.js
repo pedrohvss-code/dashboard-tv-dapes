@@ -228,8 +228,12 @@
     }
   }
 
-  atualizarRelogio();
-  setInterval(atualizarRelogio, 1000);
+  // Agenda cada atualização para a virada exata do segundo (setInterval acumula atraso)
+  function tique() {
+    atualizarRelogio();
+    setTimeout(tique, 1000 - (Date.now() % 1000) + 5);
+  }
+  tique();
 
   // ===================================================================
   //  Faixa de notícias (RSS via rss2json)
