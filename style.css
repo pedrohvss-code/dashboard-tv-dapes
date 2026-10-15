@@ -25,7 +25,7 @@ html, body {
 
 body {
   display: grid;
-  grid-template-rows: 9vh 1fr 56px;
+  grid-template-rows: 9vh 1fr 5.5vh 56px;
 }
 
 /* ---------- Cabeçalho ---------- */
@@ -96,6 +96,33 @@ main { position: relative; overflow: hidden; }
   font-size: 1.7vh; color: var(--suave);
   background: rgba(11, 15, 23, .85); padding: .3vh 1vh; border-radius: 6px;
 }
+
+/* ---------- Faixa de notícias ---------- */
+.noticias {
+  display: flex; align-items: stretch;
+  border-top: 1px solid var(--borda);
+  background: var(--painel);
+  overflow: hidden;
+}
+.noticias-rotulo {
+  display: flex; align-items: center;
+  padding: 0 1.6vw;
+  background: var(--dourado); color: #0b0f17;
+  font-size: 2vh; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+.noticias-janela { position: relative; flex: 1; overflow: hidden; display: flex; align-items: center; }
+.noticias-trilho {
+  display: inline-flex; white-space: nowrap;
+  padding-left: 2vw;
+  font-size: 2.4vh;
+  will-change: transform;
+}
+.noticias-trilho.correndo { padding-left: 0; animation: correr linear infinite; }
+@keyframes correr { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.noticia { padding-right: 4vw; }
+.noticia .fonte { color: var(--dourado); font-weight: 700; margin-right: .8vh; }
+.noticia .hora-noticia { color: var(--suave); margin-right: 1vh; font-variant-numeric: tabular-nums; }
 
 /* ---------- Rodapé ---------- */
 footer { border-top: 1px solid var(--borda); overflow: hidden; }

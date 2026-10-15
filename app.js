@@ -23,7 +23,6 @@
       hasTopBar: false, isDataSetEnabled: false, isZoomEnabled: false, hasSymbolTooltip: true, isMonoSize: false,
     }],
     calendario: ["events",               { ...BASE, importanceFilter: "0,1", countryFilter: "br,us" }],
-    noticias:   ["timeline",             { ...BASE, feedMode: "all_symbols", displayMode: "regular" }],
     faixa:      ["ticker-tape",          { colorTheme: "dark", isTransparent: true, locale: "br", showSymbolLogo: true, displayMode: "adaptive" }],
   };
 
@@ -188,6 +187,73 @@
 
   atualizarRelogio();
   setInterval(atualizarRelogio, 1000);
+
+  // ===================================================================
+  //  Faixa de notícias (RSS via rss2json)
+  // ===================================================================
+  const NC = CFG.noticias;
+  const trilho = document.getElementById("noticias");
+  const fmtHoraSP = new Intl.DateTimeFormat("pt-BR", { timeZone: FUSO, hour: "2-digit", minute: "2-digit" });
+  const decodificar = (txt) => new DOMParser().parseFromString(txt, "text/html").documentElement.textContent.trim();
+  let pendentes = null;
+
+  async function buscarFonte(fonte) {
+    const r = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(fonte.url));
+    const d = await r.json();
+    if (d.status !== "ok") throw new Error(d.message || "falha no feed " + fonte.nome);
+    // pubDate vem em UTC no formato "AAAA-MM-DD HH:MM:SS"
+    return d.items.map((i) => ({ fonte: fonte.nome, titulo: decodificar(i.title), data: new Date(i.pubDate.replace(" ", "T") + "Z") }));
+  }
+
+  function criarNoticia(n) {
+    const el = document.createElement("span");
+    el.className = "noticia";
+    const fonte = document.createElement("span");
+    fonte.className = "fonte";
+    fonte.textContent = n.fonte;
+    el.appendChild(fonte);
+    if (!isNaN(n.data)) {
+      const hora = document.createElement("span");
+      hora.className = "hora-noticia";
+      hora.textContent = fmtHoraSP.format(n.data);
+      el.appendChild(hora);
+    }
+    el.appendChild(document.createTextNode(n.titulo));
+    return el;
+  }
+
+  function aplicarNoticias(itens) {
+    trilho.classList.remove("correndo");
+    trilho.replaceChildren();
+    // Conteúdo duplicado: a animação anda 50% e recomeça sem emenda visível
+    for (let copia = 0; copia < 2; copia++) itens.forEach((n) => trilho.appendChild(criarNoticia(n)));
+    trilho.style.animationDuration = `${trilho.scrollWidth / 2 / NC.velocidade}s`;
+    trilho.classList.add("correndo");
+  }
+
+  // Notícias novas só entram quando a faixa completa uma volta
+  trilho.addEventListener("animationiteration", () => {
+    if (pendentes) { aplicarNoticias(pendentes); pendentes = null; }
+  });
+
+  async function atualizarNoticias() {
+    const resultados = await Promise.allSettled(NC.fontes.map(buscarFonte));
+    resultados.filter((r) => r.status === "rejected").forEach((r) => console.warn("Notícias:", r.reason));
+
+    const limite = Date.now() - NC.maxHorasAtras * 3600 * 1000;
+    const vistos = new Set();
+    const itens = resultados
+      .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
+      .filter((n) => n.titulo && !(n.data < limite) && !vistos.has(n.titulo) && vistos.add(n.titulo))
+      .sort((a, b) => b.data - a.data);
+
+    if (!itens.length) return; // mantém as notícias anteriores se tudo falhar
+    if (trilho.classList.contains("correndo")) pendentes = itens;
+    else aplicarNoticias(itens);
+  }
+
+  atualizarNoticias();
+  setInterval(atualizarNoticias, NC.atualizarACadaMin * 60 * 1000);
 
   // ===================================================================
   //  Recarga periódica

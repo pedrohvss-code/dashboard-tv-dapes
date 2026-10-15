@@ -53,7 +53,7 @@ window.DASH_CONFIG = {
   //  layout: grid CSS (cada letra/palavra é uma área)
   //  widgets: { area, tipo, opcoes }
   //  Tipos disponíveis: grafico, mini, cotacoes, visaoGeral,
-  //                     destaques, heatmap, calendario, noticias
+  //                     destaques, heatmap, calendario
   // ---------------------------------------------------------------
   telas: [
     {
@@ -119,14 +119,20 @@ window.DASH_CONFIG = {
         { area: "mapa", tipo: "heatmap", opcoes: { dataSource: "IBOV", exchanges: [] } },
       ],
     },
-    {
-      titulo: "Agenda e notícias",
-      layout: `"agenda noticias"`,
-      colunas: "1fr 1fr",
-      widgets: [
-        { area: "agenda",   tipo: "calendario", opcoes: { countryFilter: "br,us" } },
-        { area: "noticias", tipo: "noticias",   opcoes: {} },
-      ],
-    },
   ],
+
+  // ---------------------------------------------------------------
+  // Faixa de notícias corrida (RSS lido via api.rss2json.com, que
+  // libera o acesso pelo navegador; o serviço guarda cache de ~1h)
+  // ---------------------------------------------------------------
+  noticias: {
+    fontes: [
+      { nome: "InfoMoney",   url: "https://www.infomoney.com.br/feed/" },
+      { nome: "Money Times", url: "https://www.moneytimes.com.br/feed/" },
+      { nome: "Valor",       url: "https://pox.globo.com/rss/valor/" },
+    ],
+    atualizarACadaMin: 10,
+    maxHorasAtras: 24,       // ignora notícias mais antigas que isso
+    velocidade: 110,         // pixels por segundo
+  },
 };
