@@ -26,7 +26,31 @@
     faixa:      ["ticker-tape",          { colorTheme: "dark", isTransparent: true, locale: "br", showSymbolLogo: true, displayMode: "adaptive" }],
   };
 
+  // Widgets novos do TradingView no formato Web Component (<tv-...>).
+  // As opções viram atributos HTML (true = atributo presente, false = ausente).
+  const COMPONENTES = {
+    mapaEconomico: ["tv-economic-map", { region: "global", theme: "dark", transparent: true }],
+  };
+  const modulosCarregados = new Set();
+
+  function montarComponente(destino, [tag, padrao], opcoes) {
+    if (!modulosCarregados.has(tag)) {
+      const script = document.createElement("script");
+      script.type = "module";
+      script.src = `https://widgets.tradingview-widget.com/w/br/${tag}.js`;
+      document.head.appendChild(script);
+      modulosCarregados.add(tag);
+    }
+    const el = document.createElement(tag);
+    Object.entries({ ...padrao, ...opcoes }).forEach(([k, v]) => {
+      if (v === true) el.setAttribute(k, "");
+      else if (v !== false && v != null) el.setAttribute(k, v);
+    });
+    destino.appendChild(el);
+  }
+
   function montarWidget(destino, tipo, opcoes) {
+    if (COMPONENTES[tipo]) return montarComponente(destino, COMPONENTES[tipo], opcoes);
     const def = WIDGETS[tipo];
     if (!def) { console.warn("Tipo de widget desconhecido:", tipo); return; }
     const [nome, padrao] = def;

@@ -53,7 +53,7 @@ window.DASH_CONFIG = {
   //  layout: grid CSS (cada letra/palavra é uma área)
   //  widgets: { area, tipo, opcoes }
   //  Tipos disponíveis: grafico, mini, cotacoes, visaoGeral,
-  //                     destaques, heatmap, calendario
+  //                     destaques, heatmap, calendario, mapaEconomico
   // ---------------------------------------------------------------
   telas: [
     {
@@ -117,6 +117,20 @@ window.DASH_CONFIG = {
       colunas: "1fr",
       widgets: [
         { area: "mapa", tipo: "heatmap", opcoes: { dataSource: "IBOV", exchanges: [] } },
+      ],
+    },
+    {
+      // Mapas econômicos — metric: intr (juros), iryy (inflação), gdp (PIB),
+      // ur (desemprego), gdg (dívida/PIB)
+      titulo: "Economia global",
+      layout: `"juros inflacao agenda" "pib desemprego agenda"`,
+      colunas: "1fr 1fr 0.8fr",
+      widgets: [
+        { area: "juros",      tipo: "mapaEconomico", opcoes: { metric: "intr", "hide-selection": true } },
+        { area: "inflacao",   tipo: "mapaEconomico", opcoes: { metric: "iryy", "hide-selection": true } },
+        { area: "pib",        tipo: "mapaEconomico", opcoes: { metric: "gdp",  "hide-selection": true } },
+        { area: "desemprego", tipo: "mapaEconomico", opcoes: { metric: "ur",   "hide-selection": true } },
+        { area: "agenda",     tipo: "calendario",    opcoes: { countryFilter: "br,us,eu,cn" } },
       ],
     },
   ],

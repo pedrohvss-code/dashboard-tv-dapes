@@ -84,6 +84,7 @@ main { position: relative; overflow: hidden; }
 .bloco .tradingview-widget-container,
 .bloco .tradingview-widget-container__widget { width: 100%; height: 100%; }
 .tradingview-widget-copyright { display: none; }
+.bloco > tv-economic-map { display: block; width: 100%; height: 100%; padding: 1vh; box-sizing: border-box; }
 
 /* Nome da tela + barra de progresso */
 .indicador {
